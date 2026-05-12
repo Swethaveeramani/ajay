@@ -21,7 +21,7 @@
 
 .huge-text {
   @apply font-display leading-[0.85] tracking-tight uppercase text-brand;
-  font-size: clamp(4rem, 12vw, 15rem);
+  font-size: clamp(3rem, 15vw, 15rem);
 }
 
 .photo-card {

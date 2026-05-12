@@ -15,12 +15,28 @@
         "updatedAt": { "type": "string", "format": "date-time" }
       },
       "required": ["url", "title", "ownerId", "index"]
+    },
+    "Setting": {
+      "title": "Setting",
+      "description": "Global application settings",
+      "type": "object",
+      "properties": {
+        "audioUrl": { "type": "string", "description": "URL or base64 of the first background music" },
+        "audioUrl2": { "type": "string", "description": "URL or base64 of the second background music" },
+        "activeTrack": { "type": "number", "description": "Which track is currently active (1 or 2)" },
+        "ownerId": { "type": "string", "description": "UID of the owner" }
+      },
+      "required": ["ownerId"]
     }
   },
   "firestore": {
     "memories/{memoryId}": {
       "schema": "Memory",
       "description": "Collection of birthday memories"
+    },
+    "settings/{settingId}": {
+      "schema": "Setting",
+      "description": "App settings like background music"
     }
   }
 }
