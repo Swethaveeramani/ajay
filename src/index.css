@@ -10,8 +10,12 @@
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
   body {
-    @apply bg-dark text-white font-sans;
+    @apply bg-dark text-white font-sans antialiased;
+    overflow-x: hidden;
   }
 }
 

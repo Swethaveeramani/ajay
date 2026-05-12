@@ -39,8 +39,8 @@ service cloud.firestore {
     }
 
     match /memories/{memoryId} {
-      allow list: if isSignedIn() && resource.data.ownerId == request.auth.uid;
-      allow get: if isSignedIn() && resource.data.ownerId == request.auth.uid;
+      allow list: if true;
+      allow get: if true;
       
       allow create: if isSignedIn() 
         && isValidId(memoryId)

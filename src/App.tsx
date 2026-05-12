@@ -135,15 +135,9 @@ export default function App() {
 
   // Firestore Sync
   useEffect(() => {
-    if (!user) {
-      setMemories([]);
-      return;
-    }
-
     const path = 'memories';
     const q = query(
       collection(db, path), 
-      where('ownerId', '==', user.uid),
       orderBy('index', 'asc')
     );
 
@@ -261,7 +255,7 @@ export default function App() {
 
   if (isSurpriseMode) {
     return (
-      <div className="min-h-screen bg-dark text-white overflow-hidden relative font-sans">
+      <div className="min-h-screen bg-dark text-white relative font-sans overflow-y-auto">
         <AnimatePresence mode="wait">
           {!showFinalMessage ? (
             <motion.div 
@@ -474,7 +468,7 @@ export default function App() {
 
       <div className="flex flex-col lg:flex-row min-h-screen">
         {/* Left Section: Bold Hero Typography */}
-        <section className="lg:w-[40%] xl:w-[35%] lg:h-screen lg:fixed lg:left-0 lg:top-0 p-8 md:p-12 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-white/10 bg-black/40 z-20">
+        <section className="lg:w-[40%] xl:w-[35%] lg:h-screen lg:fixed lg:left-0 lg:top-0 p-8 md:p-12 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-white/10 bg-black/40 z-20 lg:overflow-y-auto">
           <div>
             <motion.p 
               initial={{ opacity: 0, y: 10 }}
@@ -580,12 +574,14 @@ export default function App() {
                   <span className="year-label">{memory.age || '—'}</span>
 
                   <div className="absolute top-4 right-4 flex gap-2 translate-y-[-10px] opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all z-20">
-                    <button 
-                      onClick={() => removeMemory(memory.id)}
-                      className="p-2 bg-red-600 text-white rounded-md hover:bg-red-500 transition-colors"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    {user && memory.ownerId === user.uid && (
+                      <button 
+                        onClick={() => removeMemory(memory.id)}
+                        className="p-2 bg-red-600 text-white rounded-md hover:bg-red-500 transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
 
                   <div className="absolute inset-x-0 bottom-0 p-8 transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all text-left">
@@ -594,22 +590,22 @@ export default function App() {
                       value={memory.age || ''}
                       placeholder="Age/Year"
                       onChange={(e) => updateMemory(memory.id, { age: e.target.value })}
-                      disabled={!user}
-                      className="text-[10px] font-black uppercase tracking-[0.3em] text-brand mb-2 bg-transparent outline-none border-b border-brand/30 focus:border-brand w-full"
+                      disabled={!user || memory.ownerId !== user.uid}
+                      className="text-[10px] font-black uppercase tracking-[0.3em] text-brand mb-2 bg-transparent outline-none border-b border-brand/30 focus:border-brand w-full disabled:border-transparent"
                     />
                     <input 
                       type="text" 
                       value={memory.title || ''}
                       placeholder="Title"
                       onChange={(e) => updateMemory(memory.id, { title: e.target.value })}
-                      disabled={!user}
+                      disabled={!user || memory.ownerId !== user.uid}
                       className="text-2xl font-display uppercase tracking-tight text-white mb-2 bg-transparent outline-none w-full"
                     />
                     <textarea 
                       value={memory.description || ''}
                       placeholder="Message..."
                       onChange={(e) => updateMemory(memory.id, { description: e.target.value })}
-                      disabled={!user}
+                      disabled={!user || memory.ownerId !== user.uid}
                       className="text-sm text-white/70 bg-transparent outline-none w-full resize-none h-12 leading-snug"
                     />
                   </div>
