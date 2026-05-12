@@ -1,0 +1,26 @@
+{
+  "entities": {
+    "Memory": {
+      "title": "Memory",
+      "description": "A single photo memory with metadata",
+      "type": "object",
+      "properties": {
+        "url": { "type": "string", "description": "Data URL or Cloud Storage URL of the image" },
+        "title": { "type": "string", "description": "Title of the memory" },
+        "age": { "type": "string", "description": "Age or time period of the memory" },
+        "description": { "type": "string", "description": "A short story or note about the memory" },
+        "ownerId": { "type": "string", "description": "UID of the user who owns this memory" },
+        "index": { "type": "number", "description": "Ordering index of the memory" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["url", "title", "ownerId", "index"]
+    }
+  },
+  "firestore": {
+    "memories/{memoryId}": {
+      "schema": "Memory",
+      "description": "Collection of birthday memories"
+    }
+  }
+}

@@ -1,0 +1,61 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(ownerId) {
+      return isSignedIn() && request.auth.uid == ownerId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidMemory(data) {
+      return data.keys().hasAll(['url', 'title', 'ownerId', 'index', 'createdAt', 'updatedAt'])
+        && data.keys().size() <= 8
+        && data.url is string && data.url.size() < 1048576 // 1MB limit for data URLs roughly
+        && data.title is string && data.title.size() <= 200
+        && data.ownerId == request.auth.uid
+        && data.index is number
+        && data.createdAt == request.time
+        && data.updatedAt == request.time;
+    }
+
+    match /memories/{memoryId} {
+      allow list: if isSignedIn() && resource.data.ownerId == request.auth.uid;
+      allow get: if isSignedIn() && resource.data.ownerId == request.auth.uid;
+      
+      allow create: if isSignedIn() 
+        && isValidId(memoryId)
+        && isValidMemory(incoming());
+        
+      allow update: if isSignedIn()
+        && isOwner(existing().ownerId)
+        && incoming().ownerId == existing().ownerId
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && (
+          incoming().diff(existing()).affectedKeys().hasOnly(['title', 'age', 'description', 'index', 'updatedAt'])
+        );
+        
+      allow delete: if isSignedIn() && isOwner(existing().ownerId);
+    }
+  }
+}
